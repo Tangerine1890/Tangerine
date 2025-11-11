@@ -30,13 +30,13 @@
   // Charger les analytics après que l'utilisateur ait interagi avec le site
   window.addEventListener('load', function() {
     setTimeout(function() {
-      // Plausible Analytics
-      var plausible = document.createElement('script');
-      plausible.defer = true;
-      plausible.dataset.domain = 'YOUR_DOMAIN_HERE';
-      plausible.src = 'https://plausible.io/js/script.js';
-      document.head.appendChild(plausible);
-      
+      // Umami Analytics
+      var umami = document.createElement('script');
+      umami.defer = true;
+      umami.src = 'https://cloud.umami.is/script.js';
+      umami.setAttribute('data-website-id', '75e01154-ec06-4bdf-bc72-4b7fb1157e5b');
+      document.head.appendChild(umami);
+
       // Microsoft Clarity
       (function(c,l,a,r,i,t,y){
         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
