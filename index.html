@@ -98,7 +98,7 @@
     --cta-green-end: #059669;
     --cta-accent-orange: rgba(249, 115, 22, 0.28);
     --cta-accent-glow: rgba(249, 115, 22, 0.24);
-    --cta-ring: #34d399;
+    --cta-orange: #f97316;
   }
   
   .snap-x { 
@@ -317,7 +317,7 @@
   .loading-progress-bar {
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, rgba(29, 212, 127, 0.95), rgba(15, 191, 106, 0.95), rgba(249, 115, 22, 0.4));
+    background: linear-gradient(90deg, rgba(29, 212, 127, 0.95), rgba(15, 191, 106, 0.95), rgba(249, 115, 22, 0.85));
     transform-origin: left;
     transform: scaleX(0.12);
     transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
@@ -390,12 +390,12 @@
     position: relative;
     overflow: hidden;
     border-radius: inherit;
-    background: linear-gradient(124deg, rgba(29, 212, 127, 0.92) 0%, rgba(15, 191, 106, 0.98) 48%, rgba(5, 150, 105, 0.98) 100%);
+    background: linear-gradient(124deg, rgba(29, 212, 127, 0.98) 0%, rgba(15, 191, 106, 0.98) 42%, rgba(5, 150, 105, 0.96) 70%, rgba(249, 115, 22, 0.95) 100%);
     border: 1px solid rgba(148, 241, 190, 0.32);
     box-shadow:
       0 16px 32px rgba(6, 95, 70, 0.45),
-      0 0 22px var(--cta-accent-glow),
-      inset 0 0 0 1px rgba(249, 115, 22, 0.2);
+      0 0 26px rgba(249, 115, 22, 0.28),
+      inset 0 0 0 1px rgba(249, 115, 22, 0.22);
     color: #f4fff9;
     font-weight: 700;
     letter-spacing: 0.02em;
@@ -404,9 +404,9 @@
 
   .glass-cta:hover {
     box-shadow:
-      0 24px 40px rgba(6, 95, 70, 0.52),
-      0 0 32px rgba(249, 115, 22, 0.32),
-      inset 0 0 0 1px rgba(249, 115, 22, 0.24);
+      0 26px 42px rgba(6, 95, 70, 0.5),
+      0 0 38px rgba(249, 115, 22, 0.36),
+      inset 0 0 0 1px rgba(249, 115, 22, 0.28);
     filter: brightness(1.05);
   }
 
@@ -414,28 +414,28 @@
     transform: scale(0.95);
     box-shadow:
       0 12px 26px rgba(6, 95, 70, 0.48),
-      0 0 18px rgba(249, 115, 22, 0.26),
-      inset 0 0 0 1px rgba(249, 115, 22, 0.22);
+      0 0 20px rgba(249, 115, 22, 0.26),
+      inset 0 0 0 1px rgba(249, 115, 22, 0.24);
   }
 
   .cta-primary {
     position: relative;
-    background: linear-gradient(124deg, var(--cta-green-start) 0%, var(--cta-green-mid) 48%, var(--cta-green-end) 100%);
+    background: linear-gradient(124deg, var(--cta-green-start) 0%, var(--cta-green-mid) 45%, var(--cta-green-end) 72%, var(--cta-orange) 100%);
     color: #f4fff9;
     border: 1px solid rgba(148, 241, 190, 0.32);
     box-shadow:
       0 16px 32px rgba(6, 95, 70, 0.45),
-      0 0 24px var(--cta-accent-glow),
-      inset 0 0 0 1px rgba(249, 115, 22, 0.18);
+      0 0 28px rgba(249, 115, 22, 0.28),
+      inset 0 0 0 1px rgba(249, 115, 22, 0.2);
     overflow: hidden;
     transition: transform 0.18s ease, box-shadow 0.24s ease, filter 0.24s ease;
   }
 
   .cta-primary:hover {
     box-shadow:
-      0 26px 42px rgba(6, 95, 70, 0.5),
-      0 0 36px rgba(249, 115, 22, 0.32),
-      inset 0 0 0 1px rgba(249, 115, 22, 0.24);
+      0 28px 46px rgba(6, 95, 70, 0.5),
+      0 0 42px rgba(249, 115, 22, 0.34),
+      inset 0 0 0 1px rgba(249, 115, 22, 0.26);
     filter: brightness(1.05);
   }
 
@@ -443,8 +443,8 @@
     transform: scale(0.96);
     box-shadow:
       0 16px 28px rgba(6, 95, 70, 0.48),
-      0 0 20px rgba(249, 115, 22, 0.24),
-      inset 0 0 0 1px rgba(249, 115, 22, 0.22);
+      0 0 24px rgba(249, 115, 22, 0.28),
+      inset 0 0 0 1px rgba(249, 115, 22, 0.24);
   }
 
   
@@ -576,7 +576,7 @@
   }
 
   .progress-bar-fill {
-    background: linear-gradient(90deg, rgba(29, 212, 127, 0.92), rgba(15, 191, 106, 0.92), rgba(249, 115, 22, 0.32));
+    background: linear-gradient(90deg, rgba(29, 212, 127, 0.92), rgba(15, 191, 106, 0.92), rgba(249, 115, 22, 0.8));
   }
   
   button:focus-visible, a:focus-visible {
@@ -1882,7 +1882,7 @@ const ProductCard = React.memo(({ product, onAddToCart, onAnimateAdd, onViewDeta
           <span className="text-3xl">{product.emoji}</span>
           <h3 className="text-white font-bold text-lg flex-1">{product.name}</h3>
           <span className={`font-bold text-xs px-2 py-1 rounded-lg ${
-            isAccessory ? 'bg-white/10 text-white/80 border border-white/10' : 'text-orange-400 bg-orange-500/20'
+            isAccessory ? 'bg-white/10 text-white/80 border border-white/10' : 'text-emerald-300 bg-emerald-500/20'
           }`}>
             {isAccessory ? 'Prix à définir' : `${PRICES[product.category]}€/g`}
           </span>
@@ -1972,7 +1972,7 @@ const PromoCodeInput = ({ appliedPromo, onApplyPromo, onRemovePromo }) => {
           )}
           <button
             onClick={handleApply}
-            className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-bold py-3 rounded-xl transition-all active:scale-95"
+            className="w-full cta-primary font-bold py-3 rounded-xl transition-all active:scale-95"
           >
             Appliquer
           </button>
@@ -2390,12 +2390,12 @@ const CartDrawer = ({ isOpen, onClose, cart, onUpdateQuantity, onRemoveItem, onC
                   style={{ animationDelay: `${idx * 30}ms` }}
                 >
                   <div className="flex gap-3 mb-3">
-                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500/20 to-pink-500/20 flex items-center justify-center text-2xl flex-shrink-0">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500/20 via-emerald-500/10 to-orange-500/20 flex items-center justify-center text-2xl flex-shrink-0">
                       {item.product.emoji}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-white font-semibold text-sm truncate">{item.product.name}</p>
-                      <p className="text-orange-400 text-xs font-bold">{item.quantity}g × {PRICES[item.product.category]}€</p>
+                      <p className="text-emerald-300 text-xs font-bold">{item.quantity}g × {PRICES[item.product.category]}€</p>
                       <p className="text-white/90 font-bold text-lg">{item.totalPrice}€</p>
                     </div>
                     <button
@@ -2464,7 +2464,7 @@ const CartDrawer = ({ isOpen, onClose, cart, onUpdateQuantity, onRemoveItem, onC
                       }}
                       className={`${
                         deliveryCity === key
-                          ? 'bg-gradient-to-r from-orange-500 to-pink-500 scale-105 glow'
+                          ? 'cta-primary scale-105 glow'
                           : 'glass hover:bg-white/10'
                       } text-white font-semibold py-3 px-2 rounded-xl transition-all text-sm relative active:scale-95`}
                     >
@@ -2561,7 +2561,7 @@ const CartDrawer = ({ isOpen, onClose, cart, onUpdateQuantity, onRemoveItem, onC
                   
                   <div className="relative h-2 bg-white/10 rounded-full overflow-hidden">
                     <div 
-                      className="absolute inset-0 bg-gradient-to-r from-orange-500 via-pink-500 to-orange-500 rounded-full transition-all duration-500 ease-out"
+                      className="absolute inset-0 progress-bar-fill rounded-full transition-all duration-500 ease-out"
                       style={{ width: `${progressPercentage}%` }}
                     />
                   </div>
@@ -2648,7 +2648,7 @@ const SearchBar = ({ onSearch, searchQuery, onQueryChange }) => {
   return (
     <form onSubmit={handleSearch} className="relative w-full max-w-md mx-auto mb-6">
       <div className={`glass rounded-2xl p-3 flex items-center gap-3 transition-all ${
-        isFocused ? 'ring-2 ring-orange-500' : ''
+        isFocused ? 'ring-2 ring-emerald-400' : ''
       }`}>
         <span className="text-2xl">🔍</span>
         <input
@@ -2675,7 +2675,7 @@ const SearchBar = ({ onSearch, searchQuery, onQueryChange }) => {
         )}
         <button
           type="submit"
-          className="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white px-4 py-2 rounded-xl font-bold text-sm transition-all active:scale-95"
+          className="cta-primary text-white px-4 py-2 rounded-xl font-bold text-sm transition-all active:scale-95"
         >
           Rechercher
         </button>
@@ -2703,7 +2703,7 @@ const FilterSortBar = ({ onFilterChange, onSortChange, selectedCategory, sortBy 
         <select
           value={sortBy}
           onChange={(e) => onSortChange(e.target.value)}
-          className="flex-shrink-0 glass text-white px-4 py-2 rounded-xl font-semibold text-sm outline-none focus:ring-2 focus:ring-orange-500"
+          className="flex-shrink-0 glass text-white px-4 py-2 rounded-xl font-semibold text-sm outline-none focus:ring-2 focus:ring-emerald-400"
         >
           <option value="default">Trier par</option>
           <option value="price-low">Prix: Croissant</option>
@@ -2723,7 +2723,7 @@ const FilterSortBar = ({ onFilterChange, onSortChange, selectedCategory, sortBy 
                 max="1000"
                 value={priceRange.min}
                 onChange={(e) => setPriceRange({ ...priceRange, min: parseInt(e.target.value) || 0 })}
-                className="flex-1 glass text-white px-3 py-2 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+                className="flex-1 glass text-white px-3 py-2 rounded-xl outline-none focus:ring-2 focus:ring-emerald-400 text-sm"
                 placeholder="Min"
               />
               <span className="text-white/60">-</span>
@@ -2945,7 +2945,7 @@ const ProductDetailModal = ({ product, onClose, onAddToCart, openViewer }) => {
               <button
                 key={m + idx}
                 onClick={() => { setSelectedMediaIndex(idx); setMediaLoaded(false); }}
-                className={`rounded-xl overflow-hidden border-2 ${selectedMediaIndex === idx ? 'border-orange-400 ring-2 ring-orange-400/50' : 'border-white/10 hover:border-white/30'} p-0 transition-all focus:outline-none focus:ring-2 focus:ring-orange-400/50`}
+                className={`rounded-xl overflow-hidden border-2 ${selectedMediaIndex === idx ? 'border-emerald-400 ring-2 ring-emerald-300/50' : 'border-white/10 hover:border-white/30'} p-0 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-300/50`}
                 style={{ minWidth: 96, minHeight: 64 }}
                 title={`Ouvrir média ${idx + 1}`}
                 role="option"
@@ -3023,7 +3023,7 @@ const ProductDetailModal = ({ product, onClose, onAddToCart, openViewer }) => {
                       onClick={() => setSelectedQuantity(qty)}
                       className={`glass text-white font-bold py-3 rounded-xl transition-all active:scale-95 ${
                         selectedQuantity === qty
-                          ? 'bg-gradient-to-r from-orange-500 to-pink-500 scale-105 shadow-lg'
+                          ? 'cta-primary scale-105 shadow-lg'
                           : 'hover:bg-white/10'
                       }`}
                     >
@@ -3038,7 +3038,7 @@ const ProductDetailModal = ({ product, onClose, onAddToCart, openViewer }) => {
                     min={MIN_QUANTITY}
                     value={selectedQuantity}
                     onChange={(e) => setSelectedQuantity(Math.max(MIN_QUANTITY, parseInt(e.target.value) || MIN_QUANTITY))}
-                    className="flex-1 glass text-white px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 text-center font-bold"
+                    className="flex-1 glass text-white px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-emerald-400 text-center font-bold"
                     placeholder={`Min. ${MIN_QUANTITY}g`}
                   />
                   <div className="glass px-6 py-3 rounded-xl flex items-center">
