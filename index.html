@@ -2782,7 +2782,8 @@ const App = () => {
         try {
           const nav = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
           const isFast = nav ? (nav.saveData ? false : (nav.effectiveType || '').toLowerCase().includes('4g')) : true;
-          setShowParticles(window.innerWidth > 700 && isFast);
+          const allowParticles = isFast || window.innerWidth >= 360;
+        setShowParticles(allowParticles);
           // Add a low-data CSS mode to reduce heavy visual effects for slow connections
           const isLowData = nav ? (nav.saveData || !((nav.effectiveType||'').toLowerCase().includes('4g'))) : false;
           if (isLowData) document.documentElement.classList.add('low-data');
@@ -3075,8 +3076,8 @@ const App = () => {
 
   // Theme-aware background classes
   const bgClasses = theme === 'light' 
-    ? 'min-h-screen bg-gradient-to-br from-slate-100 via-purple-50 to-slate-100 relative overflow-hidden'
-    : 'min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden';
+    ? 'min-h-screen bg-gradient-to-br from-[#f8fafc] via-[#edf4ef] to-[#f8fafc] relative overflow-hidden'
+    : 'min-h-screen bg-gradient-to-br from-[#05090b] via-[#0b1411] to-[#05090b] relative overflow-hidden';
   
   const textClasses = theme === 'light' ? 'text-slate-900' : 'text-white';
   const textSecondaryClasses = theme === 'light' ? 'text-slate-600' : 'text-white/60';
