@@ -23,6 +23,27 @@
       console.error('Telegram init error:', e);
     }
   }
+
+  // Désactiver Umami pour le compte propriétaire (@Tangerine_212)
+  (function disableUmamiForOwner() {
+    const disable = () => {
+      try {
+        const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+        if (tgUser?.username && tgUser.username.toLowerCase() === 'tangerine_212') {
+          localStorage.setItem('umami.disabled', '1');
+          console.log('📊 Umami tracking disabled for owner session');
+          return true;
+        }
+      } catch (error) {
+        console.warn('Umami owner check failed', error);
+      }
+      return false;
+    };
+
+    if (!disable()) {
+      setTimeout(disable, 800); // Retry après init éventuelle du WebApp
+    }
+  })();
 </script>
 
 <!-- OPTIMISATION #4: Lazy load analytics après 3s pour ne pas ralentir le chargement initial -->
