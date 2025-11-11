@@ -420,6 +420,16 @@ class VideoManager {
     this.loading = new Set();
     this.cache = new Map();
     this.queue = [];
+    this.isIosTelegram = this.detectIosTelegram();
+  }
+
+  detectIosTelegram() {
+    try {
+      if (window.Telegram?.WebApp?.platform) {
+        return window.Telegram.WebApp.platform.toLowerCase() === 'ios';
+      }
+    } catch (e) {}
+    return /iphone|ipad|ipod/i.test(navigator.userAgent || '');
   }
 
   async loadVideo(src, options = {}) {
@@ -470,10 +480,17 @@ class VideoManager {
       videoElement.muted = true;
       videoElement.setAttribute('playsinline', '');
       videoElement.setAttribute('muted', '');
-      
-      // Try to load from cache or fetch
-      const objectUrl = await this.loadVideo(src);
-      videoElement.src = objectUrl;
+      videoElement.setAttribute('webkit-playsinline', '');
+      videoElement.defaultMuted = true;
+
+      const useDirectSrc = options?.forceDirectSrc || this.isIosTelegram;
+      if (useDirectSrc) {
+        videoElement.src = src;
+      } else {
+        // Try to load from cache or fetch
+        const objectUrl = await this.loadVideo(src);
+        videoElement.src = objectUrl;
+      }
 
       // Précharger les données vidéo sans lancer la lecture
       return new Promise((resolve, reject) => {
