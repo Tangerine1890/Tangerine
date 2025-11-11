@@ -380,6 +380,149 @@
     height: 20px;
     fill: currentColor;
   }
+
+  /* Onboarding overlay */
+  .onboarding-backdrop {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at top, rgba(15, 23, 42, 0.9), rgba(2, 6, 8, 0.95));
+    backdrop-filter: blur(18px);
+    z-index: 80;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .onboarding-panel {
+    max-width: 420px;
+    width: 100%;
+    border-radius: 28px;
+    padding: 2rem 1.75rem;
+    background: rgba(17, 24, 39, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 40px 70px -30px rgba(0, 0, 0, 0.8);
+    color: #f8fafc;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .onboarding-panel::before {
+    content: '';
+    position: absolute;
+    inset: -40% -30% auto auto;
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.28), transparent 65%);
+    filter: blur(10px);
+    z-index: 0;
+  }
+
+  .onboarding-panel::after {
+    content: '';
+    position: absolute;
+    inset: auto auto -45% -35%;
+    width: 280px;
+    height: 280px;
+    background: radial-gradient(circle, rgba(34, 197, 94, 0.24), transparent 60%);
+    filter: blur(12px);
+    z-index: 0;
+  }
+
+  .onboarding-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .onboarding-title {
+    font-size: 1.65rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.01em;
+  }
+
+  .onboarding-description {
+    font-size: 1rem;
+    color: rgba(248, 250, 252, 0.75);
+    line-height: 1.45rem;
+    margin-bottom: 1.4rem;
+  }
+
+  .onboarding-bullets {
+    display: grid;
+    gap: 0.65rem;
+    margin-bottom: 1.8rem;
+  }
+
+  .onboarding-bullet {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: 0.95rem;
+    color: rgba(248, 250, 252, 0.8);
+  }
+
+  .onboarding-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .onboarding-progress {
+    display: flex;
+    gap: 0.4rem;
+  }
+
+  .onboarding-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.35);
+    transition: all 0.25s ease;
+  }
+
+  .onboarding-dot.active {
+    width: 28px;
+    background: linear-gradient(135deg, #f97316, #22c55e);
+  }
+
+  .onboarding-next {
+    padding: 0.7rem 1.4rem;
+    border-radius: 999px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #f97316, #22c55e);
+    color: #0b1120;
+    border: none;
+    box-shadow: 0 12px 30px -15px rgba(248, 113, 22, 0.8);
+  }
+
+  .onboarding-skip {
+    background: transparent;
+    border: none;
+    color: rgba(248, 250, 252, 0.65);
+    font-size: 0.95rem;
+  }
+
+  @media (max-width: 480px) {
+    .onboarding-panel {
+      padding: 1.6rem 1.4rem;
+      border-radius: 22px;
+    }
+
+    .onboarding-title {
+      font-size: 1.45rem;
+    }
+
+    .onboarding-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .onboarding-progress {
+      justify-content: center;
+    }
+  }
   
   /* Light theme styles - Enhanced day mode palette */
   .theme-light {
@@ -819,6 +962,39 @@ const CATEGORIES = [
   { id: 'freshfrozen', label: 'Fresh Frozen', emoji: '❄️', gradient: 'from-[#2563eb] to-[#06b6d4]' }
 ];
 
+const ONBOARDING_STEPS = [
+  {
+    id: 'welcome',
+    title: 'Bienvenue chez TANGERINE ✨',
+    description: "Explore les catégories premium, chaque vidéo se lance toute seule — laisse-toi guider.",
+    bullets: [
+      'Swipe horizontalement pour changer de famille',
+      'Les émojis indiquent le type de produit',
+      'Appuie sur une carte pour les détails complets'
+    ]
+  },
+  {
+    id: 'categories',
+    title: 'Choisis ta vibe 💎',
+    description: 'Passe d’un univers à l’autre : WPFF glacé, Double Static intense ou Fresh Frozen ultra frais.',
+    bullets: [
+      'Le bouton « Tous » montre la sélection complète',
+      'Chaque switch relance les vidéos adaptées',
+      'Les filtres avancés sont disponibles via « Filtres »'
+    ]
+  },
+  {
+    id: 'products',
+    title: 'Découvre nos cartes 🧊',
+    description: 'Vidéo immersive, quantités en 1 clic, ajout immédiat au panier ou plein écran.',
+    bullets: [
+      'Icône ❤️ pour sauvegarder dans tes favoris',
+      'Bouton 🛒 pour ajouter instantanément',
+      'Swipe pour parcourir les visuels'
+    ]
+  }
+];
+
 const QUANTITY_OPTIONS = [5, 10, 20];
 const MIN_QUANTITY = 5;
 
@@ -1000,6 +1176,43 @@ const StorageManager = {
     } catch (error) {
       return 'dark';
     }
+  },
+
+  async saveOnboardingSeen(seen = true) {
+    try {
+      await window.storage.set('tangerine_onboarding_seen', seen ? '1' : '0');
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('tangerine_onboarding_seen', seen ? '1' : '0');
+      }
+      return true;
+    } catch (error) {
+      console.error('Storage error:', error);
+      try {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('tangerine_onboarding_seen', seen ? '1' : '0');
+          return true;
+        }
+      } catch (e) {}
+      return false;
+    }
+  },
+
+  async loadOnboardingSeen() {
+    try {
+      const result = await window.storage.get('tangerine_onboarding_seen');
+      if (result && typeof result.value !== 'undefined') {
+        return result.value === '1' || result.value === true || result.value === 'true';
+      }
+    } catch (error) {
+      /* ignore */
+    }
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const lsValue = localStorage.getItem('tangerine_onboarding_seen');
+        return lsValue === '1' || lsValue === 'true';
+      }
+    } catch (e) {}
+    return false;
   }
 };
 
@@ -1450,7 +1663,7 @@ const PaymentMethodSelector = ({ selectedMethod, onMethodChange, showCryptoAddre
             selectedMethod === 'cash'
               ? 'bg-gradient-to-r from-green-500 to-emerald-500 scale-105 glow'
               : 'glass hover:bg-white/10'
-          } text-white font-semibold py-4 px-3 rounded-xl transition-all text-sm active:scale-95`}
+          } text-white font-semibold py-3 px-2 rounded-xl transition-all text-sm relative active:scale-95`}
         >
           <div className="text-2xl mb-1">💵</div>
           <div>Espèces</div>
@@ -1462,7 +1675,7 @@ const PaymentMethodSelector = ({ selectedMethod, onMethodChange, showCryptoAddre
             selectedMethod === 'crypto'
               ? 'bg-gradient-to-r from-purple-500 to-blue-500 scale-105 glow'
               : 'glass hover:bg-white/10'
-          } text-white font-semibold py-4 px-3 rounded-xl transition-all text-sm active:scale-95`}
+          } text-white font-semibold py-3 px-2 rounded-xl transition-all text-sm relative active:scale-95`}
         >
           <div className="text-2xl mb-1">🪙</div>
           <div>Crypto</div>
@@ -2484,10 +2697,6 @@ const FullscreenViewer = ({ isOpen, product, startIndex = 0, onClose }) => {
   }, []);
 
   useEffect(() => {
-    setIndex(startIndex || 0);
-  }, [startIndex, product]);
-
-  useEffect(() => {
     if (!isOpen) return;
     
     const onKey = (e) => {
@@ -2734,6 +2943,8 @@ const App = () => {
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewerProduct, setViewerProduct] = useState(null);
   const [viewerStartIndex, setViewerStartIndex] = useState(0);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState(0);
 
   const openViewer = useCallback((product, startIndex = 0) => {
     setViewerProduct(product);
@@ -2756,14 +2967,24 @@ const App = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [savedCart, savedCity, savedPayment, savedPromo, savedWishlist, savedOrderHistory, savedTheme] = await Promise.all([
+        const [
+          savedCart,
+          savedCity,
+          savedPayment,
+          savedPromo,
+          savedWishlist,
+          savedOrderHistory,
+          savedTheme,
+          savedOnboarding
+        ] = await Promise.all([
           StorageManager.loadCart(),
           StorageManager.loadDeliveryCity(),
           StorageManager.loadPaymentMethod(),
           StorageManager.loadPromoCode(),
           StorageManager.loadWishlist(),
           StorageManager.loadOrderHistory(),
-          StorageManager.loadTheme()
+          StorageManager.loadTheme(),
+          StorageManager.loadOnboardingSeen()
         ]);
         setCart(savedCart);
         setDeliveryCity(savedCity);
@@ -2778,12 +2999,14 @@ const App = () => {
           // Default to dark mode
           document.documentElement.className = '';
         }
+        setShowOnboarding(!savedOnboarding);
+        setOnboardingStep(0);
         // Decide whether to show particle background: disable on narrow screens or slow connections
         try {
           const nav = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
           const isFast = nav ? (nav.saveData ? false : (nav.effectiveType || '').toLowerCase().includes('4g')) : true;
           const allowParticles = isFast || window.innerWidth >= 360;
-        setShowParticles(allowParticles);
+          setShowParticles(allowParticles);
           // Add a low-data CSS mode to reduce heavy visual effects for slow connections
           const isLowData = nav ? (nav.saveData || !((nav.effectiveType||'').toLowerCase().includes('4g'))) : false;
           if (isLowData) document.documentElement.classList.add('low-data');
@@ -2797,15 +3020,57 @@ const App = () => {
     };
     loadData();
   }, []);
-  
-  // Aggressive preloading for menu videos, especially on mobile
+
   useEffect(() => {
+    if (showOnboarding) {
+      trackEvent('onboarding_step', { step: ONBOARDING_STEPS[onboardingStep]?.id || onboardingStep });
+    }
+  }, [showOnboarding, onboardingStep]);
+
+  useEffect(() => {
+    if (showOnboarding) {
+      const previousOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        if (!viewerOpen) {
+          document.body.style.overflow = previousOverflow || '';
+        }
+      };
+    }
+  }, [showOnboarding, viewerOpen]);
+
+  const handleOnboardingFinish = useCallback(async (action = 'complete') => {
+    setShowOnboarding(false);
+    setOnboardingStep(0);
+    try {
+      await StorageManager.saveOnboardingSeen(true);
+    } catch (e) { /* ignore */ }
+    trackEvent('onboarding_finished', { action });
+  }, []);
+
+  const handleOnboardingNext = useCallback(() => {
+    const nextStep = onboardingStep + 1;
+    if (nextStep < ONBOARDING_STEPS.length) {
+      setOnboardingStep(nextStep);
+      trackEvent('onboarding_step', { step: ONBOARDING_STEPS[nextStep]?.id || nextStep });
+    } else {
+      handleOnboardingFinish('complete');
+    }
+  }, [onboardingStep, handleOnboardingFinish]);
+
+  const handleOnboardingSkip = useCallback(() => {
+    handleOnboardingFinish('skip');
+  }, [handleOnboardingFinish]);
+
+  useEffect(() => {
+    // Aggressive preloading for menu videos, especially on mobile
     if (isLoading) return;
-    
+
     try {
       // On mobile, focus on immediate menu videos
       const isMobile = window.innerWidth <= 900 || /Mobi|Android/i.test(navigator.userAgent);
       const toPreload = PRODUCTS.slice(0, isMobile ? 3 : 5);
+
       
       // Immediate thumbnail preload
       toPreload.forEach(p => {
@@ -3084,6 +3349,14 @@ const App = () => {
 
   return (
     <div className={bgClasses}>
+      {showOnboarding && (
+        <OnboardingOverlay
+          steps={ONBOARDING_STEPS}
+          currentStep={onboardingStep}
+          onNext={handleOnboardingNext}
+          onSkip={handleOnboardingSkip}
+        />
+      )}
       <div className="background-aurora" aria-hidden="true">
         <div className="aurora-blob aurora-blob-1"></div>
         <div className="aurora-blob aurora-blob-2"></div>
