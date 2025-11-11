@@ -2917,7 +2917,6 @@ const App = () => {
   const welcomeTimerRef = useRef(null);
   const welcomeUnmountRef = useRef(null);
   const categoryScrollRef = useRef(null);
-  const productScrollRef = useRef(null);
   const cartButtonRef = useRef(null);
 
   const clearWelcomeTimers = useCallback(() => {
@@ -3051,48 +3050,27 @@ const App = () => {
     };
   }, [isLoading, welcomeRendered, markWelcomeSeen, handleDismissWelcome, clearWelcomeTimers]);
 
-  const updateProductScrollProgress = useCallback(() => {
-    const container = productScrollRef.current;
-    if (!container) {
-      setCategoryProgress(0);
-      return;
-    }
-
-    const { scrollLeft, clientWidth, scrollWidth } = container;
-    if (!scrollWidth || scrollWidth <= clientWidth + 1) {
-      setCategoryProgress(1);
-      return;
-    }
-
-    const progress = (scrollLeft + clientWidth) / scrollWidth;
-    setCategoryProgress(Math.max(0, Math.min(progress, 1)));
-  }, []);
-
   useEffect(() => {
-    const container = productScrollRef.current;
-    if (!container) {
-      setCategoryProgress(0);
-      return;
-    }
+    const update = () => {
+      const doc = document.documentElement;
+      const body = document.body;
+      const scrollTop = window.scrollY || doc.scrollTop || body.scrollTop || 0;
+      const scrollHeight = doc.scrollHeight || body.scrollHeight || 1;
+      const clientHeight = window.innerHeight || doc.clientHeight || 1;
+      const maxScroll = Math.max(1, scrollHeight - clientHeight);
+      const progress = scrollTop / maxScroll;
+      setCategoryProgress(Math.max(0, Math.min(progress, 1)));
+    };
 
-    updateProductScrollProgress();
-
-    container.addEventListener('scroll', updateProductScrollProgress, { passive: true });
-    window.addEventListener('resize', updateProductScrollProgress);
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
 
     return () => {
-      container.removeEventListener('scroll', updateProductScrollProgress);
-      window.removeEventListener('resize', updateProductScrollProgress);
+      window.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
     };
-  }, [updateProductScrollProgress, filteredProducts.length]);
-
-  useEffect(() => {
-    const container = productScrollRef.current;
-    if (!container) return;
-
-    container.scrollLeft = 0;
-    requestAnimationFrame(updateProductScrollProgress);
-  }, [selectedCategory, filteredProducts.length, updateProductScrollProgress]);
+  }, []);
 
   useEffect(() => {
     // Aggressive preloading for menu videos, especially on mobile
@@ -3485,7 +3463,7 @@ const App = () => {
             <p className={`${textSecondaryClasses} text-sm`}>Essayez une autre catégorie</p>
           </div>
         ) : (
-          <div className="flex gap-5 overflow-x-auto pb-6 snap-x scroll-smooth" ref={productScrollRef}>
+          <div className="flex gap-5 overflow-x-auto pb-6 snap-x scroll-smooth">
             {filteredProducts.map((product, index) => (
               <ProductCard
                 key={product.id}
