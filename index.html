@@ -1017,48 +1017,58 @@ const ProductCard = React.memo(({ product, onAddToCart, onViewDetails, isInWishl
         setIsVisible(entry.isIntersecting);
         
         if (entry.isIntersecting) {
-          // Force play avec retry pour iOS/Telegram
-          const attemptPlay = () => {
+          // OPTIMISATION #6: Autoplay ultra-fiable avec retry agressif
+          const attemptPlay = (retryCount = 0) => {
             if (!videoRef.current) return;
+            
+            // Force les attributs à chaque tentative
             videoRef.current.muted = true;
             videoRef.current.playsInline = true;
+            videoRef.current.setAttribute('muted', '');
+            videoRef.current.setAttribute('playsinline', '');
+            
             videoRef.current.play()
               .then(() => {
                 console.log('✅ Video playing:', product.name);
               })
               .catch((error) => {
-                console.warn('⚠️ Video play retry:', error);
-                // Retry après 300ms
-                setTimeout(() => {
-                  if (videoRef.current && entry.isIntersecting) {
-                    videoRef.current.play().catch(() => {});
-                  }
-                }, 300);
+                // Retry jusqu'à 5 fois avec délai croissant
+                if (retryCount < 5 && entry.isIntersecting) {
+                  const delay = 200 * (retryCount + 1); // 200ms, 400ms, 600ms...
+                  setTimeout(() => {
+                    if (videoRef.current && entry.isIntersecting) {
+                      attemptPlay(retryCount + 1);
+                    }
+                  }, delay);
+                }
               });
           };
           
-          // Play immédiatement si chargé, sinon attendre
-          if (videoState === 'loaded') {
-            attemptPlay();
-          } else {
-            // Attendre que la vidéo soit chargée
+          // Essayer de jouer immédiatement
+          attemptPlay();
+          
+          // Si pas encore chargé, réessayer quand chargé
+          if (videoState !== 'loaded') {
             const checkLoaded = setInterval(() => {
-              if (videoState === 'loaded' && videoRef.current) {
+              if (videoState === 'loaded' && videoRef.current && entry.isIntersecting) {
                 clearInterval(checkLoaded);
                 attemptPlay();
               }
             }, 100);
-            setTimeout(() => clearInterval(checkLoaded), 3000);
+            setTimeout(() => clearInterval(checkLoaded), 5000);
           }
         } else {
           // Pause quand pas visible
           if (videoRef.current) {
-            videoRef.current.pause();
+            try {
+              videoRef.current.pause();
+              videoRef.current.currentTime = 0; // Reset pour rejouer depuis le début
+            } catch(e) {}
           }
         }
       }, { 
-        threshold: [0.3], 
-        rootMargin: '100px'
+        threshold: [0.5], // Augmenté à 50% pour être plus précis
+        rootMargin: '50px' // Réduit pour éviter de charger trop tôt
       });
     } catch (error) {
       console.error('IntersectionObserver setup failed:', error);
