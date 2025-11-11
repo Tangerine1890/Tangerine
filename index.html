@@ -507,6 +507,28 @@
   }
 
   .scroll-smooth { scroll-behavior: smooth; }
+
+  .product-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: rgba(248, 250, 252, 0.92);
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.88), rgba(236, 72, 153, 0.82));
+    border-radius: 999px;
+    padding: 0.45rem 0.85rem;
+    box-shadow: 0 12px 32px rgba(249, 115, 22, 0.28);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .product-badge::before {
+    content: '⚡';
+    font-size: 0.9rem;
+  }
   
   button:focus-visible, a:focus-visible {
     outline: 2px solid #f97316;
@@ -1108,6 +1130,7 @@ const PRODUCTS = [
     category: 'wpff', 
     name: 'Tropicali', 
     emoji: '🥭', 
+    badge: 'Sold out soon!',
     media: [
       'https://file.garden/aRCOOh-cGER2BR_t/PICALI00%20(1)%20(1).mp4',
       'https://file.garden/aRCOOh-cGER2BR_t/tropicali_2.mp4',
@@ -1142,6 +1165,7 @@ const PRODUCTS = [
     category: 'doublestatic', 
     name: 'Tropi Tangie', 
     emoji: '🍊', 
+    badge: 'Sold out soon!',
     media: ['https://file.garden/aRCOOh-cGER2BR_t/tropi_tangie.mp4'], 
     posters: ['https://file.garden/aRCOOh-cGER2BR_t/IMG_1254.avif'],
     thumbnail: 'https://file.garden/aRCOOh-cGER2BR_t/IMG_1254.avif',
@@ -1751,6 +1775,11 @@ const ProductCard = React.memo(({ product, onAddToCart, onAnimateAdd, onViewDeta
         tabIndex={0}
         onKeyDown={(e) => e.key === 'Enter' && onViewDetails(product)}
       >
+        {product.badge && (
+          <div className="absolute top-3 left-3 z-20">
+            <span className="product-badge">{product.badge}</span>
+          </div>
+        )}
         <img
           src={product.thumbnail}
           loading="lazy"
