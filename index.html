@@ -91,6 +91,15 @@
     overflow-x: hidden;
     -webkit-tap-highlight-color: transparent;
   }
+
+  :root {
+    --cta-green-start: #1dd47f;
+    --cta-green-mid: #0fbf6a;
+    --cta-green-end: #059669;
+    --cta-accent-orange: rgba(249, 115, 22, 0.28);
+    --cta-accent-glow: rgba(249, 115, 22, 0.24);
+    --cta-ring: #34d399;
+  }
   
   .snap-x { 
     scroll-snap-type: x mandatory;
@@ -308,7 +317,7 @@
   .loading-progress-bar {
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, rgba(249, 115, 22, 0.95), rgba(236, 72, 153, 0.95));
+    background: linear-gradient(90deg, rgba(29, 212, 127, 0.95), rgba(15, 191, 106, 0.95), rgba(249, 115, 22, 0.4));
     transform-origin: left;
     transform: scaleX(0.12);
     transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
@@ -381,25 +390,61 @@
     position: relative;
     overflow: hidden;
     border-radius: inherit;
-    background: linear-gradient(118deg, #ff6a3d 0%, #f97316 38%, #ea580c 68%, #c2410c 100%);
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: linear-gradient(124deg, rgba(29, 212, 127, 0.92) 0%, rgba(15, 191, 106, 0.98) 48%, rgba(5, 150, 105, 0.98) 100%);
+    border: 1px solid rgba(148, 241, 190, 0.32);
     box-shadow:
-      0 12px 24px rgba(234, 88, 12, 0.3),
-      0 0 22px rgba(194, 65, 12, 0.32);
-    color: #fff8f4;
+      0 16px 32px rgba(6, 95, 70, 0.45),
+      0 0 22px var(--cta-accent-glow),
+      inset 0 0 0 1px rgba(249, 115, 22, 0.2);
+    color: #f4fff9;
     font-weight: 700;
     letter-spacing: 0.02em;
     transition: transform 0.18s ease, box-shadow 0.24s ease, filter 0.24s ease;
   }
 
   .glass-cta:hover {
-    box-shadow: 0 16px 32px rgba(234, 88, 12, 0.34), 0 0 28px rgba(194, 65, 12, 0.34);
-    filter: brightness(1.03);
+    box-shadow:
+      0 24px 40px rgba(6, 95, 70, 0.52),
+      0 0 32px rgba(249, 115, 22, 0.32),
+      inset 0 0 0 1px rgba(249, 115, 22, 0.24);
+    filter: brightness(1.05);
   }
 
   .glass-cta:active {
     transform: scale(0.95);
-    box-shadow: 0 10px 20px rgba(180, 83, 9, 0.36), 0 0 16px rgba(124, 45, 15, 0.28);
+    box-shadow:
+      0 12px 26px rgba(6, 95, 70, 0.48),
+      0 0 18px rgba(249, 115, 22, 0.26),
+      inset 0 0 0 1px rgba(249, 115, 22, 0.22);
+  }
+
+  .cta-primary {
+    position: relative;
+    background: linear-gradient(124deg, var(--cta-green-start) 0%, var(--cta-green-mid) 48%, var(--cta-green-end) 100%);
+    color: #f4fff9;
+    border: 1px solid rgba(148, 241, 190, 0.32);
+    box-shadow:
+      0 16px 32px rgba(6, 95, 70, 0.45),
+      0 0 24px var(--cta-accent-glow),
+      inset 0 0 0 1px rgba(249, 115, 22, 0.18);
+    overflow: hidden;
+    transition: transform 0.18s ease, box-shadow 0.24s ease, filter 0.24s ease;
+  }
+
+  .cta-primary:hover {
+    box-shadow:
+      0 26px 42px rgba(6, 95, 70, 0.5),
+      0 0 36px rgba(249, 115, 22, 0.32),
+      inset 0 0 0 1px rgba(249, 115, 22, 0.24);
+    filter: brightness(1.05);
+  }
+
+  .cta-primary:active {
+    transform: scale(0.96);
+    box-shadow:
+      0 16px 28px rgba(6, 95, 70, 0.48),
+      0 0 20px rgba(249, 115, 22, 0.24),
+      inset 0 0 0 1px rgba(249, 115, 22, 0.22);
   }
 
   
@@ -529,9 +574,13 @@
     content: '⚡';
     font-size: 0.9rem;
   }
+
+  .progress-bar-fill {
+    background: linear-gradient(90deg, rgba(29, 212, 127, 0.92), rgba(15, 191, 106, 0.92), rgba(249, 115, 22, 0.32));
+  }
   
   button:focus-visible, a:focus-visible {
-    outline: 2px solid #f97316;
+    outline: 2px solid var(--cta-ring);
     outline-offset: 2px;
   }
   
@@ -1485,7 +1534,7 @@ const LoadingScreen = ({ onComplete }) => {
 
   const clampedProgress = Math.min(100, Math.max(0, Math.round(progress)));
   const progressStyle = { transform: `scaleX(${Math.max(clampedProgress, 4) / 100})` };
-  const subtext = `Chargement des merveilles · ${clampedProgress}%`;
+  const subtext = `Chargement des résines · ${clampedProgress}%`;
 
   return (
     <div className="fixed inset-0 z-50">
