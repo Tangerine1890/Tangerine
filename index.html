@@ -215,6 +215,42 @@
     100% { transform: scale(1); }
   }
 
+  .flying-badge {
+    position: fixed;
+    z-index: 9999;
+    pointer-events: none;
+    background: rgba(15, 23, 42, 0.85);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.01em;
+    padding: 0.4rem 0.75rem;
+    border-radius: 999px;
+    box-shadow: 0 14px 35px rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(6px);
+    transform: translate(-50%, -50%);
+    opacity: 0;
+  }
+
+  .cart-button-pulse {
+    animation: cartPulse 0.45s ease;
+  }
+
+  @keyframes cartPulse {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 0 0 rgba(249, 115, 22, 0.0);
+    }
+    35% {
+      transform: scale(1.1);
+      box-shadow: 0 0 22px rgba(249, 115, 22, 0.45);
+    }
+    100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 rgba(249, 115, 22, 0.0);
+    }
+  }
+
   .card-halo {
     position: absolute;
     inset: -14px;
@@ -1228,7 +1264,7 @@ const ParticlesBackground = React.memo(() => {
 });
 
 // ===== OPTIMIZED PRODUCT CARD =====
-const ProductCard = React.memo(({ product, onAddToCart, onViewDetails, isInWishlist, onToggleWishlist, isInitiallyVisible = false }) => {
+const ProductCard = React.memo(({ product, onAddToCart, onAnimateAdd, onViewDetails, isInWishlist, onToggleWishlist, isInitiallyVisible = false }) => {
   const [videoState, setVideoState] = useState('thumbnail');
   const [isVisible, setIsVisible] = useState(isInitiallyVisible);
   const videoRef = useRef(null);
@@ -1346,12 +1382,15 @@ const ProductCard = React.memo(({ product, onAddToCart, onViewDetails, isInWishl
     }
 
     onAddToCart(product, qty, PRICES[product.category] * qty);
+    if (onAnimateAdd && button) {
+      onAnimateAdd(product, qty, button);
+    }
     trackEvent('quick_add_to_cart', { 
       product: product.name, 
       quantity: qty, 
       price: PRICES[product.category] * qty 
     });
-  }, [product, onAddToCart]);
+  }, [product, onAddToCart, onAnimateAdd]);
 
   const handleVideoLoad = useCallback(() => {
     setVideoState('loaded');
@@ -2878,6 +2917,7 @@ const App = () => {
   const welcomeTimerRef = useRef(null);
   const welcomeUnmountRef = useRef(null);
   const categoryScrollRef = useRef(null);
+  const cartButtonRef = useRef(null);
 
   const clearWelcomeTimers = useCallback(() => {
     if (welcomeTimerRef.current) {
@@ -3018,12 +3058,14 @@ const App = () => {
     }
 
     const update = () => {
-      const maxScroll = container.scrollWidth - container.clientWidth;
-      if (maxScroll <= 0) {
+      const { scrollLeft, clientWidth, scrollWidth } = container;
+      if (!scrollWidth || scrollWidth <= clientWidth + 1) {
         setCategoryProgress(1);
         return;
       }
-      setCategoryProgress(Math.min(container.scrollLeft / maxScroll, 1));
+
+      const progress = (scrollLeft + clientWidth) / scrollWidth;
+      setCategoryProgress(Math.max(0, Math.min(progress, 1)));
     };
 
     update();
@@ -3034,7 +3076,7 @@ const App = () => {
       container.removeEventListener('scroll', update);
       window.removeEventListener('resize', update);
     };
-  }, [CATEGORIES.length]);
+  }, []);
 
   useEffect(() => {
     // Aggressive preloading for menu videos, especially on mobile
@@ -3147,6 +3189,50 @@ const App = () => {
     await StorageManager.saveCart(newCart);
     showNotification(`${product.emoji} ${product.name} ajouté`, 'success');
   }, [cart, showNotification]);
+
+  const handleAnimateAdd = useCallback((product, qty, sourceButton) => {
+    try {
+      const cartButton = cartButtonRef.current;
+      if (!cartButton || !sourceButton) return;
+
+      const startRect = sourceButton.getBoundingClientRect();
+      const cartRect = cartButton.getBoundingClientRect();
+
+      const startX = startRect.left + startRect.width / 2;
+      const startY = startRect.top + startRect.height / 2;
+      const endX = cartRect.left + cartRect.width / 2;
+      const endY = cartRect.top + cartRect.height / 2;
+
+      const midX = startX + (endX - startX) * 0.6;
+      const midY = Math.min(startY, endY) - 70;
+
+      const badge = document.createElement('div');
+      badge.className = 'flying-badge';
+      badge.textContent = `${product.emoji} +${qty}g`;
+      badge.style.left = `${startX}px`;
+      badge.style.top = `${startY}px`;
+      document.body.appendChild(badge);
+
+      const animation = badge.animate([
+        { left: `${startX}px`, top: `${startY}px`, opacity: 0, transform: 'scale(0.6)' },
+        { left: `${startX}px`, top: `${startY}px`, opacity: 1, transform: 'scale(1)', offset: 0.2 },
+        { left: `${midX}px`, top: `${midY}px`, opacity: 1, transform: 'scale(0.9)', offset: 0.6 },
+        { left: `${endX}px`, top: `${endY}px`, opacity: 0, transform: 'scale(0.45)' }
+      ], {
+        duration: 650,
+        easing: 'ease-in-out'
+      });
+
+      const removeBadge = () => badge.remove();
+      animation.addEventListener('finish', removeBadge);
+      animation.addEventListener('cancel', removeBadge);
+
+      cartButton.classList.add('cart-button-pulse');
+      setTimeout(() => cartButton.classList.remove('cart-button-pulse'), 480);
+    } catch (error) {
+      console.error('animateAdd failed', error);
+    }
+  }, []);
 
   const updateQuantity = useCallback(async (index, newQuantity, newPrice) => {
     const newCart = cart.map((item, idx) =>
@@ -3390,6 +3476,7 @@ const App = () => {
                 key={product.id}
                 product={product}
                 onAddToCart={addToCart}
+                onAnimateAdd={handleAnimateAdd}
                 onViewDetails={setSelectedProduct}
                 isInWishlist={wishlist.some(item => item.id === product.id)}
                 onToggleWishlist={handleToggleWishlist}
@@ -3411,6 +3498,7 @@ const App = () => {
 
         <button
           onClick={() => setIsCartOpen(true)}
+          ref={cartButtonRef}
           className="relative bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white px-6 py-3 rounded-full font-bold transition-all hover:scale-105 active:scale-95 glow"
         >
           <span className="mr-2">🛒</span>
