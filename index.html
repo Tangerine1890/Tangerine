@@ -3051,29 +3051,23 @@ const App = () => {
   }, [isLoading, welcomeRendered, markWelcomeSeen, handleDismissWelcome, clearWelcomeTimers]);
 
   useEffect(() => {
-    const container = categoryScrollRef.current;
-    if (!container) {
-      setCategoryProgress(0);
-      return;
-    }
-
     const update = () => {
-      const { scrollLeft, clientWidth, scrollWidth } = container;
-      if (!scrollWidth || scrollWidth <= clientWidth + 1) {
-        setCategoryProgress(1);
-        return;
-      }
-
-      const progress = (scrollLeft + clientWidth) / scrollWidth;
+      const doc = document.documentElement;
+      const body = document.body;
+      const scrollTop = window.scrollY || doc.scrollTop || body.scrollTop || 0;
+      const scrollHeight = doc.scrollHeight || body.scrollHeight || 1;
+      const clientHeight = window.innerHeight || doc.clientHeight || 1;
+      const maxScroll = Math.max(1, scrollHeight - clientHeight);
+      const progress = scrollTop / maxScroll;
       setCategoryProgress(Math.max(0, Math.min(progress, 1)));
     };
 
     update();
-    container.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
 
     return () => {
-      container.removeEventListener('scroll', update);
+      window.removeEventListener('scroll', update);
       window.removeEventListener('resize', update);
     };
   }, []);
@@ -3187,7 +3181,6 @@ const App = () => {
     
     setCart(newCart);
     await StorageManager.saveCart(newCart);
-    showNotification(`${product.emoji} ${product.name} ajouté`, 'success');
   }, [cart, showNotification]);
 
   const handleAnimateAdd = useCallback((product, qty, sourceButton) => {
