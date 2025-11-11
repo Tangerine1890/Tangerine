@@ -141,30 +141,30 @@
   }
   
   .glass {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    background: rgba(18, 24, 25, 0.78);
+    border: 1px solid rgba(181, 139, 69, 0.18);
+    box-shadow: 0 24px 60px -20px rgba(5, 8, 9, 0.9);
   }
   
   .glass-dark {
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    background: rgba(10, 14, 15, 0.85);
+    border: 1px solid rgba(181, 139, 69, 0.22);
+    box-shadow: 0 28px 60px -18px rgba(4, 6, 7, 0.85);
   }
   
   .gradient-text {
-    background: linear-gradient(135deg, #f59e0b, #f97316, #ec4899);
+    background: linear-gradient(135deg, #4f5d3a, #5f7041, #b58b45);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
   
   .glow {
-    box-shadow: 0 0 30px rgba(249, 115, 22, 0.6);
+    box-shadow: 0 0 32px rgba(181, 139, 69, 0.45);
   }
   
   .glow-pink {
-    box-shadow: 0 0 30px rgba(236, 72, 153, 0.5);
+    box-shadow: 0 0 32px rgba(34, 197, 94, 0.35);
   }
   
   .card-hover {
@@ -257,55 +257,55 @@
   }
 
   .aurora-blob-1 {
-    top: -20vmax;
-    left: -15vmax;
-    background: radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.55), rgba(59, 130, 246, 0));
+    top: -24vmax;
+    left: -14vmax;
+    background: radial-gradient(circle at 30% 30%, rgba(42, 68, 53, 0.55), rgba(42, 68, 53, 0));
     animation-delay: 0s;
   }
 
   .aurora-blob-2 {
-    top: 10vmax;
+    top: 16vmax;
     right: -18vmax;
-    background: radial-gradient(circle at 70% 40%, rgba(236, 72, 153, 0.55), rgba(236, 72, 153, 0));
-    animation-delay: 4s;
+    background: radial-gradient(circle at 70% 40%, rgba(92, 72, 44, 0.55), rgba(92, 72, 44, 0));
+    animation-delay: 5s;
   }
 
   .aurora-blob-3 {
     bottom: -22vmax;
     left: 20vmax;
-    background: radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.45), rgba(249, 115, 22, 0));
-    animation-delay: 8s;
+    background: radial-gradient(circle at 50% 50%, rgba(19, 40, 31, 0.55), rgba(19, 40, 31, 0));
+    animation-delay: 10s;
   }
 
   .theme-light .aurora-blob {
-    opacity: 0.35;
+    opacity: 0.28;
     mix-blend-mode: multiply;
   }
 
   .theme-light .aurora-blob-1 {
-    background: radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.35), rgba(59, 130, 246, 0));
+    background: radial-gradient(circle at 30% 30%, rgba(166, 196, 156, 0.32), rgba(166, 196, 156, 0));
   }
 
   .theme-light .aurora-blob-2 {
-    background: radial-gradient(circle at 70% 40%, rgba(236, 72, 153, 0.4), rgba(236, 72, 153, 0));
+    background: radial-gradient(circle at 70% 40%, rgba(204, 181, 143, 0.3), rgba(204, 181, 143, 0));
   }
 
   .theme-light .aurora-blob-3 {
-    background: radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.35), rgba(249, 115, 22, 0));
+    background: radial-gradient(circle at 50% 50%, rgba(189, 206, 193, 0.3), rgba(189, 206, 193, 0));
   }
 
   .noise-overlay {
     position: absolute;
     inset: 0;
-    background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"%3E%3Cfilter id="n" x="0" y="0" width="1" height="1"%3E%3CfeTurbulence baseFrequency="0.8" numOctaves="2" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="64" height="64" filter="url(%23n)" opacity="0.25"/%3E%3C/svg%3E');
-    opacity: 0.12;
+    background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"%3E%3Cfilter id="n" x="0" y="0" width="1" height="1"%3E%3CfeTurbulence baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="64" height="64" filter="url(%23n)" opacity="0.35"/%3E%3C/svg%3E');
+    opacity: 0.18;
     mix-blend-mode: soft-light;
     pointer-events: none;
     z-index: 1;
   }
 
   .theme-light .noise-overlay {
-    opacity: 0.08;
+    opacity: 0.1;
     mix-blend-mode: multiply;
   }
 
@@ -428,7 +428,7 @@
   
   /* Light theme specific adjustments for better contrast */
   .theme-light .gradient-text {
-    background: linear-gradient(135deg, #ea580c, #f97316, #ec4899);
+    background: linear-gradient(135deg, #a3e635, #86efac, #fde68a);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
