@@ -93,6 +93,7 @@
   }
 
   :root {
+    --telegram-top-bar-height: 0px;
     --cta-green-start: #1dd47f;
     --cta-green-mid: #0fbf6a;
     --cta-green-end: #059669;
@@ -242,6 +243,12 @@
     gap: 1.6rem;
     text-align: center;
     color: #f8fafc;
+  }
+
+  .app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: calc((var(--vh, 1vh) * 100) - var(--telegram-top-bar-height, 0px));
   }
 
   .loading-logo-wrap {
@@ -3347,6 +3354,45 @@ const App = () => {
   const cartButtonRef = useRef(null);
   const auroraRef = useRef(null);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const tg = window.Telegram?.WebApp;
+
+    const updateViewportMetrics = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+
+      let topBarHeight = 0;
+      if (tg && typeof tg.viewportStableHeight === 'number') {
+        const diff = window.innerHeight - tg.viewportStableHeight;
+        if (diff > 0) topBarHeight = diff;
+      } else if (tg && !tg.isExpanded) {
+        topBarHeight = 56;
+      }
+      document.documentElement.style.setProperty('--telegram-top-bar-height', `${topBarHeight}px`);
+    };
+
+    updateViewportMetrics();
+
+    const handleResize = () => updateViewportMetrics();
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    window.addEventListener('pageshow', updateViewportMetrics);
+    if (tg?.onEvent) {
+      tg.onEvent('viewportChanged', updateViewportMetrics);
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+      window.removeEventListener('pageshow', updateViewportMetrics);
+      if (tg?.offEvent) {
+        tg.offEvent('viewportChanged', updateViewportMetrics);
+      }
+    };
+  }, []);
+
   const clearWelcomeTimers = useCallback(() => {
     if (welcomeTimerRef.current) {
       clearTimeout(welcomeTimerRef.current);
@@ -3943,7 +3989,7 @@ const App = () => {
         )}
       </main>
 
-      <nav className={`fixed bottom-4 left-1/2 -translate-x-1/2 z-40 glass-dark px-6 py-3 rounded-full shadow-2xl flex gap-4 items-center`}>
+      <nav className={`fixed bottom-4 left-1/2 -translate-x-1/2 z-40 glass-dark px-5 py-2.5 rounded-full shadow-2xl flex gap-4 items-center transition-all duration-300`}>
         <button 
           onClick={() => handleCategoryChange('all')}
           className={`${textClasses} hover:scale-110 active:scale-95 transition-all p-2`}
