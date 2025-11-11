@@ -973,12 +973,37 @@ const ParticlesBackground = React.memo(() => {
 });
 
 // ===== OPTIMIZED PRODUCT CARD =====
-const ProductCard = React.memo(({ product, onAddToCart, onViewDetails, isInWishlist, onToggleWishlist }) => {
+const ProductCard = React.memo(({ product, onAddToCart, onViewDetails, isInWishlist, onToggleWishlist, isInitiallyVisible = false }) => {
   const [videoState, setVideoState] = useState('thumbnail');
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(isInitiallyVisible);
   const videoRef = useRef(null);
   const cardRef = useRef(null);
   const observerRef = useRef(null);
+  const productKey = useMemo(() => product.id || product.name || 'unknown', [product.id, product.name]);
+
+  const forcePlay = useCallback((reason, retryCount = 0) => {
+    const video = videoRef.current;
+    if (!video || videoState === 'error') {
+      return;
+    }
+
+    video.muted = true;
+    video.playsInline = true;
+    video.setAttribute('muted', '');
+    video.setAttribute('playsinline', '');
+
+    video.play()
+      .then(() => {
+        logMediaMetric(productKey, 0, `play_success_${reason}`);
+      })
+      .catch((error) => {
+        logMediaMetric(productKey, 0, `play_error_${reason}`);
+        if (retryCount < 5 && (isVisible || isInitiallyVisible)) {
+          const delay = 200 * (retryCount + 1);
+          setTimeout(() => forcePlay(reason, retryCount + 1), delay);
+        }
+      });
+  }, [isVisible, isInitiallyVisible, productKey, videoState]);
 
   useEffect(() => {
     let isCurrentMount = true;
@@ -996,12 +1021,12 @@ const ProductCard = React.memo(({ product, onAddToCart, onViewDetails, isInWishl
             if (!isCurrentMount) return;
             const loadTime = performance.now() - loadStartTime;
             setVideoState('loaded');
-            pushDiag('load_success', { loadTime });
+            logMediaMetric(productKey, 0, `load_success_${Math.round(loadTime)}ms`);
           })
           .catch(error => {
             if (!isCurrentMount) return;
             setVideoState('error');
-            pushDiag('load_error', { error: error.message });
+            logMediaMetric(productKey, 0, `load_error_${error?.message || 'unknown'}`);
           });
       }
       
@@ -1015,48 +1040,10 @@ const ProductCard = React.memo(({ product, onAddToCart, onViewDetails, isInWishl
         if (!entry || !videoRef.current) return;
         
         setIsVisible(entry.isIntersecting);
+        logMediaMetric(productKey, 0, entry.isIntersecting ? 'observer_enter' : 'observer_exit');
         
         if (entry.isIntersecting) {
-          // OPTIMISATION #6: Autoplay ultra-fiable avec retry agressif
-          const attemptPlay = (retryCount = 0) => {
-            if (!videoRef.current) return;
-            
-            // Force les attributs à chaque tentative
-            videoRef.current.muted = true;
-            videoRef.current.playsInline = true;
-            videoRef.current.setAttribute('muted', '');
-            videoRef.current.setAttribute('playsinline', '');
-            
-            videoRef.current.play()
-              .then(() => {
-                console.log('✅ Video playing:', product.name);
-              })
-              .catch((error) => {
-                // Retry jusqu'à 5 fois avec délai croissant
-                if (retryCount < 5 && entry.isIntersecting) {
-                  const delay = 200 * (retryCount + 1); // 200ms, 400ms, 600ms...
-                  setTimeout(() => {
-                    if (videoRef.current && entry.isIntersecting) {
-                      attemptPlay(retryCount + 1);
-                    }
-                  }, delay);
-                }
-              });
-          };
-          
-          // Essayer de jouer immédiatement
-          attemptPlay();
-          
-          // Si pas encore chargé, réessayer quand chargé
-          if (videoState !== 'loaded') {
-            const checkLoaded = setInterval(() => {
-              if (videoState === 'loaded' && videoRef.current && entry.isIntersecting) {
-                clearInterval(checkLoaded);
-                attemptPlay();
-              }
-            }, 100);
-            setTimeout(() => clearInterval(checkLoaded), 5000);
-          }
+          forcePlay('observer');
         } else {
           // Pause quand pas visible
           if (videoRef.current) {
@@ -1078,8 +1065,21 @@ const ProductCard = React.memo(({ product, onAddToCart, onViewDetails, isInWishl
     
     return () => {
       if (observerRef.current) observerRef.current.disconnect();
+      isCurrentMount = false;
     };
-  }, [videoState, product.name, product.category]);
+  }, [videoState, product.name, product.category, forcePlay, productKey]);
+
+  useEffect(() => {
+    if (videoState === 'loaded' && (isInitiallyVisible || isVisible)) {
+      forcePlay(isInitiallyVisible ? 'initial_loaded' : 'visible_loaded');
+    }
+  }, [videoState, isInitiallyVisible, isVisible, forcePlay]);
+
+  useEffect(() => {
+    if (isVisible) {
+      forcePlay('visibility_change');
+    }
+  }, [isVisible, forcePlay]);
 
   const handleQuickAdd = useCallback((qty, e) => {
     e.stopPropagation();
@@ -1093,12 +1093,13 @@ const ProductCard = React.memo(({ product, onAddToCart, onViewDetails, isInWishl
 
   const handleVideoLoad = useCallback(() => {
     setVideoState('loaded');
-    try { logMediaMetric(product.id || product.name || 'unknown', 0, 'card_loadeddata'); } catch (e) {}
-  }, [product]);
+    logMediaMetric(productKey, 0, 'card_loadeddata');
+  }, [productKey]);
 
   const handleVideoError = useCallback(() => {
     setVideoState('error');
-  }, []);
+    logMediaMetric(productKey, 0, 'card_error');
+  }, [productKey]);
 
   return (
     <div 
@@ -3002,7 +3003,7 @@ const App = () => {
           </div>
         ) : (
           <div className="flex gap-5 overflow-x-auto pb-6 snap-x scroll-smooth">
-            {filteredProducts.map((product) => (
+            {filteredProducts.map((product, index) => (
               <ProductCard
                 key={product.id}
                 product={product}
@@ -3010,6 +3011,7 @@ const App = () => {
                 onViewDetails={setSelectedProduct}
                 isInWishlist={wishlist.some(item => item.id === product.id)}
                 onToggleWishlist={handleToggleWishlist}
+                isInitiallyVisible={index === 0}
               />
             ))}
           </div>
