@@ -168,15 +168,42 @@
   }
   
   .card-hover {
+    position: relative;
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   .card-hover:hover {
     transform: translateY(-6px) scale(1.015);
   }
-  
+
   .card-hover:active {
     transform: translateY(-2px) scale(0.995);
+  }
+
+  .card-halo {
+    position: absolute;
+    inset: -2px;
+    border-radius: 26px;
+    pointer-events: none;
+    opacity: 0;
+    background: linear-gradient(140deg, rgba(249, 115, 22, 0.4), rgba(34, 197, 94, 0.35));
+    filter: blur(18px);
+    transition: opacity 0.35s ease;
+  }
+
+  .card-playing .card-halo {
+    opacity: 1;
+  }
+
+  .card-info {
+    transition: transform 0.35s ease, opacity 0.35s ease;
+    transform: translateY(12px);
+    opacity: 0;
+  }
+
+  .card-info.show {
+    transform: translateY(0);
+    opacity: 1;
   }
   
   .scroll-smooth { scroll-behavior: smooth; }
@@ -1283,11 +1310,16 @@ const ProductCard = React.memo(({ product, onAddToCart, onViewDetails, isInWishl
     logMediaMetric(productKey, 0, 'card_error');
   }, [productKey]);
 
+  const infoVisible = videoState === 'loaded' || videoState === 'error';
+
   return (
     <div 
       ref={cardRef}
-      className="snap-center flex-shrink-0 w-80 glass rounded-3xl p-5 card-hover relative overflow-hidden group"
+      className={`snap-center flex-shrink-0 w-80 glass rounded-3xl p-5 card-hover relative overflow-hidden group ${
+        videoState === 'loaded' && (isVisible || isInitiallyVisible) ? 'card-playing' : ''
+      }`}
     >
+      <div className="card-halo" aria-hidden="true"></div>
       {onToggleWishlist && (
         <WishlistButton
           product={product}
@@ -1354,7 +1386,7 @@ const ProductCard = React.memo(({ product, onAddToCart, onViewDetails, isInWishl
         </div>
       </div>
 
-      <div className="mb-4">
+      <div className={`mb-4 card-info ${infoVisible ? 'show' : ''}`}>
         <div className="flex items-center gap-2 mb-2">
           <span className="text-3xl">{product.emoji}</span>
           <h3 className="text-white font-bold text-lg flex-1">{product.name}</h3>
