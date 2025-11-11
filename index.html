@@ -269,25 +269,6 @@
     opacity: 0.32;
   }
 
-  .category-progress {
-    position: relative;
-    height: 3px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.08);
-    overflow: hidden;
-    margin-top: 0.5rem;
-  }
-
-  .category-progress .category-progress-bar {
-    position: absolute;
-    inset: 0;
-    transform-origin: left center;
-    transform: scaleX(0);
-    background: linear-gradient(90deg, rgba(249, 115, 22, 0.9), rgba(34, 197, 94, 0.85));
-    box-shadow: 0 0 14px rgba(249, 115, 22, 0.4);
-    transition: transform 0.2s ease-out;
-  }
-
   .scroll-smooth { scroll-behavior: smooth; }
   
   button:focus-visible, a:focus-visible {
@@ -883,7 +864,7 @@ const PRODUCTS = [
     name: 'Tropicali', 
     emoji: '🥭', 
     media: [
-      'https://file.garden/aRCOOh-cGER2BR_t/tropicali_1.mp4',
+      'https://file.garden/aRCOOh-cGER2BR_t/PICALI00%20(1)%20(1).mp4',
       'https://file.garden/aRCOOh-cGER2BR_t/tropicali_2.mp4',
       'https://file.garden/aRCOOh-cGER2BR_t/tropicali_3.mp4'
     ], 
@@ -970,6 +951,26 @@ const PRODUCTS = [
     posters: ['https://file.garden/aRCOOh-cGER2BR_t/IMG_1246.avif'],
     thumbnail: 'https://file.garden/aRCOOh-cGER2BR_t/IMG_1246.avif',
     desc: 'Raisin doux mélangé à des notes de biscuits croquants. Harmonie subtile et saveur élégante.' 
+  },
+  {
+    id: 'acc1',
+    category: 'accessoires',
+    name: 'TerpWrap',
+    emoji: '🟠',
+    media: ['https://file.garden/aRCOOh-cGER2BR_t/IMG_1279.JPG'],
+    posters: ['https://file.garden/aRCOOh-cGER2BR_t/IMG_1279.JPG'],
+    thumbnail: 'https://file.garden/aRCOOh-cGER2BR_t/IMG_1279.JPG',
+    desc: 'Protégez le drip. Préservez les terpènes. Emballage premium conçu pour garder vos concentrés purs, puissants et riches en terpènes.'
+  },
+  {
+    id: 'acc2',
+    category: 'accessoires',
+    name: 'Wipes',
+    emoji: '🧼',
+    media: ['https://file.garden/aRCOOh-cGER2BR_t/IMG_1279.JPG'],
+    posters: ['https://file.garden/aRCOOh-cGER2BR_t/IMG_1279.JPG'],
+    thumbnail: 'https://file.garden/aRCOOh-cGER2BR_t/IMG_1279.JPG',
+    desc: 'Fini les soucis collants. Élimine facilement les traces 🍯 ou 🍫 pour garder vos doigts impeccables.'
   }
 ];
 
@@ -977,7 +978,8 @@ const CATEGORIES = [
   { id: 'all', label: 'Tous', emoji: '✨', gradient: 'from-[#f97316] to-[#16a34a]' },
   { id: 'wpff', label: 'WPFF', emoji: '💎', gradient: 'from-[#2563eb] to-[#06b6d4]' },
   { id: 'doublestatic', label: 'Double Static', emoji: '⚡', gradient: 'from-yellow-500 to-orange-500' },
-  { id: 'freshfrozen', label: 'Fresh Frozen', emoji: '❄️', gradient: 'from-[#2563eb] to-[#06b6d4]' }
+  { id: 'freshfrozen', label: 'Fresh Frozen', emoji: '❄️', gradient: 'from-[#2563eb] to-[#06b6d4]' },
+  { id: 'accessoires', label: 'Accessoires', emoji: '🧰', gradient: 'from-[#f97316] to-[#ec4899]' }
 ];
 
 const WELCOME_STORAGE_KEY = 'tangerine_welcome_shown';
@@ -1271,6 +1273,7 @@ const ProductCard = React.memo(({ product, onAddToCart, onAnimateAdd, onViewDeta
   const cardRef = useRef(null);
   const observerRef = useRef(null);
   const productKey = useMemo(() => product.id || product.name || 'unknown', [product.id, product.name]);
+  const isAccessory = product.category === 'accessoires';
 
   const forcePlay = useCallback((reason, retryCount = 0) => {
     const video = videoRef.current;
@@ -1375,6 +1378,12 @@ const ProductCard = React.memo(({ product, onAddToCart, onAnimateAdd, onViewDeta
   const handleQuickAdd = useCallback((qty, e) => {
     e.stopPropagation();
 
+    if (product.category === 'accessoires') {
+      onViewDetails(product);
+      trackEvent('accessory_open_details', { product: product.name });
+      return;
+    }
+
     const button = e.currentTarget;
     if (button) {
       button.classList.add('tap-state');
@@ -1390,7 +1399,20 @@ const ProductCard = React.memo(({ product, onAddToCart, onAnimateAdd, onViewDeta
       quantity: qty, 
       price: PRICES[product.category] * qty 
     });
-  }, [product, onAddToCart, onAnimateAdd]);
+  }, [product, onAddToCart, onAnimateAdd, onViewDetails]);
+
+  const handleAccessoryCTA = useCallback((e) => {
+    e.stopPropagation();
+
+    const button = e.currentTarget;
+    if (button) {
+      button.classList.add('tap-state');
+      setTimeout(() => button.classList.remove('tap-state'), 260);
+    }
+
+    onViewDetails(product);
+    trackEvent('accessory_open_details', { product: product.name });
+  }, [product, onViewDetails]);
 
   const handleVideoLoad = useCallback(() => {
     setVideoState('loaded');
@@ -1479,23 +1501,35 @@ const ProductCard = React.memo(({ product, onAddToCart, onAnimateAdd, onViewDeta
         <div className="flex items-center gap-2 mb-2">
           <span className="text-3xl">{product.emoji}</span>
           <h3 className="text-white font-bold text-lg flex-1">{product.name}</h3>
-          <span className="text-orange-400 font-bold text-xs bg-orange-500/20 px-2 py-1 rounded-lg">
-            {PRICES[product.category]}€/g
+          <span className={`font-bold text-xs px-2 py-1 rounded-lg ${
+            isAccessory ? 'bg-white/10 text-white/80 border border-white/10' : 'text-orange-400 bg-orange-500/20'
+          }`}>
+            {isAccessory ? 'Prix à définir' : `${PRICES[product.category]}€/g`}
           </span>
         </div>
         <p className="text-white/60 text-sm line-clamp-2">{product.desc}</p>
       </div>
 
       <div className="flex gap-2">
-        {[5, 10, 20].map(qty => (
+        {isAccessory ? (
           <button
-            key={qty}
-            onClick={(e) => handleQuickAdd(qty, e)}
-            className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 active:scale-95 text-white font-bold py-3 rounded-xl transition-all text-sm"
+            onClick={handleAccessoryCTA}
+            className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 active:scale-95 text-white font-bold py-3 rounded-xl transition-all text-sm flex items-center justify-center gap-2"
           >
-            {qty}g<br/><span className="text-xs opacity-90">{PRICES[product.category] * qty}€</span>
+            <span>🔍</span>
+            <span>Voir détails</span>
           </button>
-        ))}
+        ) : (
+          [5, 10, 20].map(qty => (
+            <button
+              key={qty}
+              onClick={(e) => handleQuickAdd(qty, e)}
+              className="flex-1 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 active:scale-95 text-white font-bold py-3 rounded-xl transition-all text-sm"
+            >
+              {qty}g<br/><span className="text-xs opacity-90">{PRICES[product.category] * qty}€</span>
+            </button>
+          ))
+        )}
       </div>
     </div>
   );
@@ -2356,6 +2390,7 @@ const ProductDetailModal = ({ product, onClose, onAddToCart, openViewer }) => {
   const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
   const [mediaLoaded, setMediaLoaded] = useState(false);
   const videoRef = useRef(null);
+  const isAccessory = product?.category === 'accessoires';
 
   useEffect(() => {
     if (product) {
@@ -2581,53 +2616,66 @@ const ProductDetailModal = ({ product, onClose, onAddToCart, openViewer }) => {
             <p className="text-white/80 leading-relaxed text-sm">{product.desc}</p>
           </div>
 
-          <div className="glass p-4 rounded-2xl flex items-center justify-between">
-            <div>
-              <p className="text-white/60 text-sm mb-1">Prix unitaire</p>
-              <p className="gradient-text font-black text-2xl">{PRICES[product.category]}€/g</p>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-white font-bold text-lg mb-3">⚖️ Quantité (min. {MIN_QUANTITY}g)</h3>
-            <div className="grid grid-cols-3 gap-3 mb-4">
-              {QUANTITY_OPTIONS.map(qty => (
-                <button
-                  key={qty}
-                  onClick={() => setSelectedQuantity(qty)}
-                  className={`${
-                    selectedQuantity === qty
-                      ? 'bg-gradient-to-r from-orange-500 to-pink-500 scale-105'
-                      : 'glass hover:bg-white/10'
-                  } text-white font-bold py-3 rounded-xl transition-all active:scale-95`}
-                >
-                  {qty}g
-                </button>
-              ))}
-            </div>
-            
-            <div className="flex gap-3">
-              <input
-                type="number"
-                min={MIN_QUANTITY}
-                value={selectedQuantity}
-                onChange={(e) => setSelectedQuantity(Math.max(MIN_QUANTITY, parseInt(e.target.value) || MIN_QUANTITY))}
-                className="flex-1 glass text-white px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 text-center font-bold"
-                placeholder={`Min. ${MIN_QUANTITY}g`}
-              />
-              <div className="glass px-6 py-3 rounded-xl flex items-center">
-                <span className="text-white font-bold text-xl">{price}€</span>
+          {isAccessory ? (
+            <div className="space-y-4">
+              <div className="glass p-4 rounded-2xl flex items-center justify-between">
+                <div>
+                  <p className="text-white/60 text-sm mb-1">Prix indicatif</p>
+                  <p className="text-white/80 font-semibold text-lg">À définir</p>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <>
+              <div className="glass p-4 rounded-2xl flex items-center justify-between">
+                <div>
+                  <p className="text-white/60 text-sm mb-1">Prix unitaire</p>
+                  <p className="gradient-text font-black text-2xl">{PRICES[product.category]}€/g</p>
+                </div>
+              </div>
 
-          <button
-            onClick={handleAddToCart}
-            className="w-full bg-gradient-to-r from-orange-500 via-pink-500 to-orange-500 hover:from-orange-600 hover:via-pink-600 hover:to-orange-600 text-white font-bold py-4 rounded-2xl transition-all hover:scale-105 active:scale-95 glow flex items-center justify-center gap-2"
-          >
-            <span>🛒</span>
-            <span>Ajouter ({price}€)</span>
-          </button>
+              <div>
+                <h3 className="text-white font-bold text-lg mb-3">⚖️ Quantité (min. {MIN_QUANTITY}g)</h3>
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  {QUANTITY_OPTIONS.map(qty => (
+                    <button
+                      key={qty}
+                      onClick={() => setSelectedQuantity(qty)}
+                      className={`$
+                        selectedQuantity === qty
+                          ? 'bg-gradient-to-r from-orange-500 to-pink-500 scale-105'
+                          : 'glass hover:bg-white/10'
+                      } text-white font-bold py-3 rounded-xl transition-all active:scale-95`}
+                    >
+                      {qty}g
+                    </button>
+                  ))}
+                </div>
+                
+                <div className="flex gap-3">
+                  <input
+                    type="number"
+                    min={MIN_QUANTITY}
+                    value={selectedQuantity}
+                    onChange={(e) => setSelectedQuantity(Math.max(MIN_QUANTITY, parseInt(e.target.value) || MIN_QUANTITY))}
+                    className="flex-1 glass text-white px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-orange-500 text-center font-bold"
+                    placeholder={`Min. ${MIN_QUANTITY}g`}
+                  />
+                  <div className="glass px-6 py-3 rounded-xl flex items-center">
+                    <span className="text-white font-bold text-xl">{price}€</span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={handleAddToCart}
+                className="w-full bg-gradient-to-r from-orange-500 via-pink-500 to-orange-500 hover:from-orange-600 hover:via-pink-600 hover:to-orange-600 text-white font-bold py-4 rounded-2xl transition-all hover:scale-105 active:scale-95 glow flex items-center justify-center gap-2"
+              >
+                <span>🛒</span>
+                <span>Ajouter ({price}€)</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -2913,7 +2961,6 @@ const App = () => {
   const [welcomeRendered, setWelcomeRendered] = useState(false);
   const [headerReady, setHeaderReady] = useState(false);
   const [navReady, setNavReady] = useState(false);
-  const [categoryProgress, setCategoryProgress] = useState(0);
   const welcomeTimerRef = useRef(null);
   const welcomeUnmountRef = useRef(null);
   const categoryScrollRef = useRef(null);
@@ -3049,28 +3096,6 @@ const App = () => {
       clearWelcomeTimers();
     };
   }, [isLoading, welcomeRendered, markWelcomeSeen, handleDismissWelcome, clearWelcomeTimers]);
-
-  useEffect(() => {
-    const update = () => {
-      const doc = document.documentElement;
-      const body = document.body;
-      const scrollTop = window.scrollY || doc.scrollTop || body.scrollTop || 0;
-      const scrollHeight = doc.scrollHeight || body.scrollHeight || 1;
-      const clientHeight = window.innerHeight || doc.clientHeight || 1;
-      const maxScroll = Math.max(1, scrollHeight - clientHeight);
-      const progress = scrollTop / maxScroll;
-      setCategoryProgress(Math.max(0, Math.min(progress, 1)));
-    };
-
-    update();
-    window.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
-
-    return () => {
-      window.removeEventListener('scroll', update);
-      window.removeEventListener('resize', update);
-    };
-  }, []);
 
   useEffect(() => {
     // Aggressive preloading for menu videos, especially on mobile
@@ -3449,9 +3474,6 @@ const App = () => {
               {cat.label}
             </button>
           ))}
-        </div>
-        <div className="category-progress">
-          <div className="category-progress-bar" style={{ transform: `scaleX(${categoryProgress})` }}></div>
         </div>
       </header>
 
