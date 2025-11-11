@@ -25,16 +25,28 @@
   }
 </script>
 
-<!-- Privacy-friendly analytics by Plausible -->
-<script defer data-domain="YOUR_DOMAIN_HERE" src="https://plausible.io/js/script.js"></script>
-
-<!-- Microsoft Clarity Analytics -->
-<script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
+<!-- OPTIMISATION #4: Lazy load analytics après 3s pour ne pas ralentir le chargement initial -->
+<script>
+  // Charger les analytics après que l'utilisateur ait interagi avec le site
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      // Plausible Analytics
+      var plausible = document.createElement('script');
+      plausible.defer = true;
+      plausible.dataset.domain = 'YOUR_DOMAIN_HERE';
+      plausible.src = 'https://plausible.io/js/script.js';
+      document.head.appendChild(plausible);
+      
+      // Microsoft Clarity
+      (function(c,l,a,r,i,t,y){
         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
         t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
         y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "u2rza6fjql");
+      })(window, document, "clarity", "script", "u2rza6fjql");
+      
+      console.log('📊 Analytics loaded');
+    }, 3000); // Charger après 3 secondes
+  });
 </script>
 
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -68,72 +80,28 @@
   .snap-x::-webkit-scrollbar { display: none; }
   .snap-center { scroll-snap-align: center; }
   
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes slideInRight{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:translateX(0)}}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+  @keyframes shimmer{0%{background-position:-1000px 0}100%{background-position:1000px 0}}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-15px)}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+  @keyframes zoomIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+  @keyframes progressBar{from{width:0}to{width:100%}}
+  @keyframes confetti{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+  @keyframes slideDown{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
+  @keyframes scaleIn{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
   
-  @keyframes slideInRight {
-    from { opacity: 0; transform: translateX(50px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-  
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-  }
-  
-  @keyframes shimmer {
-    0% { background-position: -1000px 0; }
-    100% { background-position: 1000px 0; }
-  }
-  
-  @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-15px); }
-  }
-  
-  @keyframes spin { to { transform: rotate(360deg); } }
-  
-  @keyframes slideUp {
-    from { transform: translateY(100%); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
-  
-  @keyframes zoomIn {
-    from { transform: scale(0.9); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-  }
-  
-  @keyframes progressBar {
-    from { width: 0%; }
-    to { width: 100%; }
-  }
-  
-  @keyframes confetti {
-    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-  }
-  
-  @keyframes slideDown {
-    from { transform: translateY(-100%); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
-  
-  @keyframes scaleIn {
-    from { transform: scale(0.8); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-  }
-  
-  .animate-fade-in-up { animation: fadeInUp 0.4s ease-out forwards; }
-  .animate-slide-in-right { animation: slideInRight 0.4s ease-out forwards; }
-  .animate-pulse { animation: pulse 2s ease-in-out infinite; }
-  .animate-slide-up { animation: slideUp 0.3s ease-out forwards; }
-  .animate-zoom-in { animation: zoomIn 0.25s ease-out forwards; }
-  .animate-slide-down { animation: slideDown 0.3s ease-out forwards; }
-  .animate-scale-in { animation: scaleIn 0.2s ease-out forwards; }
-  .float { animation: float 2.5s ease-in-out infinite; }
-  .spinner { animation: spin 0.8s linear infinite; }
+  .animate-fade-in-up{animation:fadeInUp .4s ease-out forwards}
+  .animate-slide-in-right{animation:slideInRight .4s ease-out forwards}
+  .animate-pulse{animation:pulse 2s ease-in-out infinite}
+  .animate-slide-up{animation:slideUp .3s ease-out forwards}
+  .animate-zoom-in{animation:zoomIn .25s ease-out forwards}
+  .animate-slide-down{animation:slideDown .3s ease-out forwards}
+  .animate-scale-in{animation:scaleIn .2s ease-out forwards}
+  .float{animation:float 2.5s ease-in-out infinite}
+  .spinner{animation:spin .8s linear infinite}
   
   .confetti {
     position: fixed;
