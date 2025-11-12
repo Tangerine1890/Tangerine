@@ -94,9 +94,8 @@
 
   :root {
     --telegram-top-bar-height: 0px;
-    --telegram-header-base-gap: 2.2rem;
-    --bottom-nav-height: 3.4rem;
     --cta-green-start: #1dd47f;
+    --cta-green-mid: #0fbf6a;
     --cta-green-end: #059669;
     --cta-accent-orange: rgba(249, 115, 22, 0.28);
     --cta-accent-glow: rgba(249, 115, 22, 0.24);
@@ -4008,10 +4007,10 @@ const App = () => {
         )}
       </main>
 
-      <nav className={`fixed bottom-4 left-1/2 -translate-x-1/2 z-40 glass-dark rounded-full shadow-2xl flex items-center transition-all duration-300 bottom-nav`}>
+      <nav className={`fixed bottom-4 left-1/2 -translate-x-1/2 z-40 glass-dark px-5 py-2.5 rounded-full shadow-2xl flex gap-4 items-center transition-all duration-300`}>
         <button 
           onClick={() => handleCategoryChange('all')}
-          className={`${textClasses} hover:scale-105 active:scale-95 transition-all nav-icon-btn`}
+          className={`${textClasses} hover:scale-110 active:scale-95 transition-all p-2`}
           title="Accueil"
         >
           <span className="text-2xl">🏠</span>
@@ -4020,7 +4019,7 @@ const App = () => {
         <button
           onClick={() => setIsCartOpen(true)}
           ref={cartButtonRef}
-          className="relative bg-gradient-to-r from-orange-500 via-pink-500 to-orange-500 hover:from-orange-600 hover:via-pink-600 hover:to-orange-600 text-white rounded-full font-bold transition-all hover:scale-105 active:scale-95 glow cart-pill"
+          className="relative bg-gradient-to-r from-orange-500 via-pink-500 to-orange-500 hover:from-orange-600 hover:via-pink-600 hover:to-orange-600 text-white px-6 py-3 rounded-full font-bold transition-all hover:scale-105 active:scale-95 glow"
         >
           <span className="mr-2">🛒</span>
           Panier
@@ -4041,7 +4040,7 @@ const App = () => {
 
         <button
           onClick={() => setIsContactOpen(true)}
-          className={`${textClasses} hover:scale-105 active:scale-95 transition-all nav-icon-btn`}
+          className={`${textClasses} hover:scale-110 active:scale-95 transition-all p-2`}
           title="Contact"
         >
           <span className="text-2xl">💬</span>
