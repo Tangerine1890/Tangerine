@@ -4008,16 +4008,13 @@ const App = () => {
         )}
       </main>
 
-      <nav
-        className={`fixed left-1/2 -translate-x-1/2 z-40 glass-dark rounded-full shadow-2xl flex items-center transition-all duration-300 bottom-nav`}
-        style={{ height: '6.2rem', padding: '1.15rem 1.6rem', bottom: 'calc(env(safe-area-inset-bottom, 0px) + 1.1rem)' }}
-      >
+      <nav className={`fixed bottom-4 left-1/2 -translate-x-1/2 z-40 glass-dark rounded-full shadow-2xl flex items-center transition-all duration-300 bottom-nav`}>
         <button 
           onClick={() => handleCategoryChange('all')}
           className={`${textClasses} hover:scale-105 active:scale-95 transition-all nav-icon-btn`}
           title="Accueil"
         >
-          <span className="text-3xl">🏠</span>
+          <span className="text-2xl">🏠</span>
         </button>
 
         <button
@@ -4047,7 +4044,7 @@ const App = () => {
           className={`${textClasses} hover:scale-105 active:scale-95 transition-all nav-icon-btn`}
           title="Contact"
         >
-          <span className="text-3xl">💬</span>
+          <span className="text-2xl">💬</span>
         </button>
       </nav>
 
