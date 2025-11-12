@@ -1006,6 +1006,46 @@
     min-height: 3.2rem;
     font-size: 1.05rem;
   }
+
+  .bottom-nav .cart-pill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: rgba(255, 255, 255, 0.08);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+  }
+
+  .bottom-nav .cart-pill.has-progress::after {
+    opacity: 1;
+  }
+
+  .bottom-nav .cart-pill .cart-progress-track {
+    position: absolute;
+    left: 50%;
+    bottom: 0.3rem;
+    transform: translate(-50%, 6px);
+    width: 2.9rem;
+    height: 0.22rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .bottom-nav .cart-pill.has-progress .cart-progress-track {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  .bottom-nav .cart-pill .cart-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.55) 100%);
+    transition: width 0.35s ease;
+  }
 </style>
 </head>
 <body>
@@ -4049,7 +4089,7 @@ const App = () => {
         <button
           onClick={() => setIsCartOpen(true)}
           ref={cartButtonRef}
-          className="relative bg-gradient-to-r from-orange-500 via-pink-500 to-orange-500 hover:from-orange-600 hover:via-pink-600 hover:to-orange-600 text-white rounded-full font-bold transition-all hover:scale-105 active:scale-95 glow cart-pill"
+          className={`relative bg-gradient-to-r from-orange-500 via-pink-500 to-orange-500 hover:from-orange-600 hover:via-pink-600 hover:to-orange-600 text-white rounded-full font-bold transition-all hover:scale-105 active:scale-95 glow cart-pill ${cart.length > 0 && !meetsMinimum ? 'has-progress' : ''}`}
         >
           <span className="mr-2">🛒</span>
           Panier
@@ -4058,14 +4098,12 @@ const App = () => {
               {cart.length}
             </span>
           )}
-          {cart.length > 0 && !meetsMinimum && (
-            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-20 h-1 bg-white/18 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-white/80 transition-all duration-500 ease-out"
-                style={{ width: `${cartProgress}%` }}
-              />
-            </div>
-          )}
+          <div className="cart-progress-track">
+            <div 
+              className="cart-progress-fill"
+              style={{ width: cart.length > 0 && !meetsMinimum ? `${cartProgress}%` : '0%' }}
+            />
+          </div>
         </button>
 
         <button
