@@ -3359,6 +3359,16 @@ const App = () => {
 
     const tg = window.Telegram?.WebApp;
 
+    if (tg) {
+      try { tg.ready(); } catch (e) { console.warn('Telegram ready() failed', e); }
+      try { tg.expand?.(); } catch (e) { console.warn('Telegram expand() failed', e); }
+      if (typeof tg.requestFullscreen === 'function') {
+        tg.requestFullscreen().catch?.((err) => {
+          console.warn('Telegram requestFullscreen() rejected', err);
+        });
+      }
+    }
+
     const updateViewportMetrics = () => {
       const vh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty('--vh', `${vh}px`);
