@@ -3358,16 +3358,7 @@ const App = () => {
     if (typeof window === 'undefined') return;
 
     const tg = window.Telegram?.WebApp;
-
-    if (tg) {
-      try { tg.ready(); } catch (e) { console.warn('Telegram ready() failed', e); }
-      try { tg.expand?.(); } catch (e) { console.warn('Telegram expand() failed', e); }
-      if (typeof tg.requestFullscreen === 'function') {
-        tg.requestFullscreen().catch?.((err) => {
-          console.warn('Telegram requestFullscreen() rejected', err);
-        });
-      }
-    }
+    let fullscreenTimeout = null;
 
     const updateViewportMetrics = () => {
       const vh = window.innerHeight * 0.01;
@@ -3383,6 +3374,20 @@ const App = () => {
       document.documentElement.style.setProperty('--telegram-top-bar-height', `${topBarHeight}px`);
     };
 
+    if (tg) {
+      try { tg.ready(); } catch (e) { console.warn('Telegram ready() failed', e); }
+
+      fullscreenTimeout = setTimeout(() => {
+        try { tg.expand?.(); } catch (e) { console.warn('Telegram expand() failed', e); }
+        if (typeof tg.requestFullscreen === 'function') {
+          Promise.resolve(tg.requestFullscreen()).catch((err) => {
+            console.warn('Telegram requestFullscreen() rejected', err);
+          });
+        }
+        updateViewportMetrics();
+      }, 60);
+    }
+
     updateViewportMetrics();
 
     const handleResize = () => updateViewportMetrics();
@@ -3394,6 +3399,9 @@ const App = () => {
     }
 
     return () => {
+      if (fullscreenTimeout) {
+        clearTimeout(fullscreenTimeout);
+      }
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('orientationchange', handleResize);
       window.removeEventListener('pageshow', updateViewportMetrics);
