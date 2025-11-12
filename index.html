@@ -976,6 +976,36 @@
       padding-top: 5rem;
     }
   }
+
+  .bottom-nav {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 0.95rem);
+    padding: 0.85rem 1.25rem;
+    gap: 0.85rem;
+    min-height: 4.5rem;
+  }
+
+  .bottom-nav .nav-icon-btn {
+    padding: 0.65rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    line-height: 1;
+  }
+
+  .bottom-nav .nav-icon-btn span {
+    font-size: 1.55rem;
+  }
+
+  .bottom-nav .cart-pill {
+    padding: 0.85rem 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    line-height: 1;
+    min-height: 3.2rem;
+    font-size: 1.05rem;
+  }
 </style>
 </head>
 <body>
@@ -4007,19 +4037,19 @@ const App = () => {
         )}
       </main>
 
-      <nav className={`fixed bottom-4 left-1/2 -translate-x-1/2 z-40 glass-dark px-5 py-2.5 rounded-full shadow-2xl flex gap-4 items-center transition-all duration-300`}>
+      <nav className={`fixed left-1/2 -translate-x-1/2 z-40 glass-dark rounded-full shadow-2xl flex items-center transition-all duration-300 bottom-nav`}>
         <button 
           onClick={() => handleCategoryChange('all')}
-          className={`${textClasses} hover:scale-110 active:scale-95 transition-all p-2`}
+          className={`${textClasses} hover:scale-105 active:scale-95 transition-all nav-icon-btn`}
           title="Accueil"
         >
-          <span className="text-2xl">🏠</span>
+          <span>🏠</span>
         </button>
 
         <button
           onClick={() => setIsCartOpen(true)}
           ref={cartButtonRef}
-          className="relative bg-gradient-to-r from-orange-500 via-pink-500 to-orange-500 hover:from-orange-600 hover:via-pink-600 hover:to-orange-600 text-white px-6 py-3 rounded-full font-bold transition-all hover:scale-105 active:scale-95 glow"
+          className="relative bg-gradient-to-r from-orange-500 via-pink-500 to-orange-500 hover:from-orange-600 hover:via-pink-600 hover:to-orange-600 text-white rounded-full font-bold transition-all hover:scale-105 active:scale-95 glow cart-pill"
         >
           <span className="mr-2">🛒</span>
           Panier
@@ -4040,10 +4070,10 @@ const App = () => {
 
         <button
           onClick={() => setIsContactOpen(true)}
-          className={`${textClasses} hover:scale-110 active:scale-95 transition-all p-2`}
+          className={`${textClasses} hover:scale-105 active:scale-95 transition-all nav-icon-btn`}
           title="Contact"
         >
-          <span className="text-2xl">💬</span>
+          <span>💬</span>
         </button>
       </nav>
 
