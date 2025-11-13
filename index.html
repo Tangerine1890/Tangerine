@@ -70,7 +70,9 @@
   });
 </script>
 
-<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script type="module" src="/src/main.jsx"></script>
+
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
@@ -1246,10 +1248,6 @@ const PROMO_CODES = {
   'HARAGAZZ': { discount: 0.15, label: '-15%' }
 };
 
-const CRYPTO_ADDRESSES = {
-  solana: '8XKBLvWkbQKyAYWGMXHhmUUzvXeZCnFEo9uzeqa8fS8V'
-};
-
 const PRODUCTS = [
   { 
     id: 't1', 
@@ -2059,49 +2057,8 @@ const PromoCodeInput = ({ appliedPromo, onApplyPromo, onRemovePromo }) => {
   );
 };
 
-// ===== CRYPTO ADDRESS DISPLAY =====
-const CryptoAddressDisplay = ({ crypto, address }) => {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(address);
-    setCopied(true);
-    trackEvent('crypto_address_copied', { crypto });
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <div className="glass rounded-2xl p-4 space-y-3 animate-slide-up">
-      <div className="flex items-center gap-3 mb-2">
-        <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center">
-          <span className="text-xl">💰</span>
-        </div>
-        <div>
-          <p className="text-white font-bold">Solana (SOL)</p>
-          <p className="text-white/60 text-xs">Copiez l'adresse ci-dessous</p>
-        </div>
-      </div>
-      
-      <div className="glass-dark rounded-xl p-3 break-all">
-        <p className="text-white/90 text-xs font-mono">{address}</p>
-      </div>
-      
-      <button
-        onClick={handleCopy}
-        className={`w-full ${
-          copied 
-            ? 'bg-green-500 hover:bg-green-600' 
-            : 'bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600'
-        } text-white font-bold py-3 rounded-xl transition-all active:scale-95`}
-      >
-        {copied ? '✅ Copié !' : '📋 Copier l\'adresse'}
-      </button>
-    </div>
-  );
-};
-
 // ===== PAYMENT METHOD SELECTOR =====
-const PaymentMethodSelector = ({ selectedMethod, onMethodChange, showCryptoAddress }) => {
+const PaymentMethodSelector = ({ selectedMethod, onMethodChange }) => {
   return (
     <div className="glass rounded-2xl p-4 space-y-3">
       <div className="flex items-center gap-2 mb-2">
@@ -2135,20 +2092,24 @@ const PaymentMethodSelector = ({ selectedMethod, onMethodChange, showCryptoAddre
         </button>
       </div>
       
-      {selectedMethod === 'crypto' && showCryptoAddress && (
-        <div className="space-y-3 mt-4">
-          <button
-            onClick={() => showCryptoAddress('solana')}
-            className="w-full glass hover:bg-white/10 text-white font-semibold py-3 px-4 rounded-xl transition-all active:scale-95 flex items-center justify-between"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center text-sm">
-                ◎
+      {selectedMethod === 'crypto' && (
+        <div className="grid grid-cols-2 gap-2 mt-4">
+          {[
+            { label: 'Solana', icon: '◎', gradient: 'from-purple-500 to-blue-500' },
+            { label: 'Bitcoin', icon: '₿', gradient: 'from-orange-500 to-amber-500' },
+            { label: 'USDT', icon: '₮', gradient: 'from-emerald-500 to-green-500' },
+            { label: 'Ethereum', icon: 'Ξ', gradient: 'from-blue-500 to-cyan-500' }
+          ].map(({ label, icon, gradient }) => (
+            <div
+              key={label}
+              className="glass-dark rounded-lg p-3 flex items-center gap-3"
+            >
+              <div className={`w-9 h-9 bg-gradient-to-br ${gradient} rounded-lg flex items-center justify-center text-base`}> 
+                {icon}
               </div>
-              <span>Solana</span>
+              <span className="text-white/80 text-sm font-semibold">{label}</span>
             </div>
-            <span className="text-white/60">→</span>
-          </button>
+          ))}
         </div>
       )}
     </div>
@@ -2374,7 +2335,6 @@ const ContactModal = ({ isOpen, onClose }) => {
 
 // ===== OPTIMIZED CART DRAWER =====
 const CartDrawer = ({ isOpen, onClose, cart, onUpdateQuantity, onRemoveItem, onCheckout, deliveryCity, onDeliveryCityChange, paymentMethod, onPaymentMethodChange, appliedPromo, onApplyPromo, onRemovePromo }) => {
-  const [showCryptoAddress, setShowCryptoAddress] = useState(null);
   
   const subtotal = useMemo(() => 
     cart.reduce((sum, item) => sum + item.totalPrice, 0), 
@@ -2415,11 +2375,6 @@ const CartDrawer = ({ isOpen, onClose, cart, onUpdateQuantity, onRemoveItem, onC
     }
     return () => { document.body.style.overflow = 'unset'; };
   }, [isOpen, cart.length]);
-
-  const handleShowCryptoAddress = (crypto) => {
-    setShowCryptoAddress(crypto);
-    trackEvent('crypto_address_shown', { crypto });
-  };
 
   return (
     <>
@@ -2516,15 +2471,7 @@ const CartDrawer = ({ isOpen, onClose, cart, onUpdateQuantity, onRemoveItem, onC
               <PaymentMethodSelector
                 selectedMethod={paymentMethod}
                 onMethodChange={onPaymentMethodChange}
-                showCryptoAddress={handleShowCryptoAddress}
               />
-
-              {showCryptoAddress && (
-                <CryptoAddressDisplay
-                  crypto={showCryptoAddress}
-                  address={CRYPTO_ADDRESSES[showCryptoAddress]}
-                />
-              )}
 
               <div className="glass rounded-2xl p-4 space-y-3">
                 <div className="flex items-center gap-2 mb-2">
